@@ -11,19 +11,11 @@ const Home = () => {
     const isLoading = company.loading
     const companies = company.companies
     useEffect(() => {
-        //Mount
-        console.log('mount')
         dispatch(actions.fetchCompanies.started({}));
-        return () => {
-            console.log('unmount')
-        }
     }, [])
     return (
         <Wrapper>
-            <Header as="h1">Top</Header>
-            <Button>
-                <Link to="/login">Go to Login Page</Link>
-            </Button>
+            <Button onClick={()=>{console.log(companies)}}>Hi</Button>
         </Wrapper>
     )
 }

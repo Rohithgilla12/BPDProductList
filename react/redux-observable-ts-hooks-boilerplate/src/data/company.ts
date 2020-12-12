@@ -16,7 +16,6 @@ export class CompanyApi {
                     const company = document.data() as Company;
                     companies.push(company);
                 }));
-        console.log(companies);
         return companies;
     }
 }
