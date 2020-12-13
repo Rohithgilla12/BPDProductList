@@ -2,4 +2,3 @@
   base    = "app/product-list/"
   command = "yarn run build"
   publish = "app/product-list/build/"
-#   functions = "functions"
