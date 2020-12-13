@@ -13,6 +13,7 @@ export function CompanyList() {
 
     useEffect(() => {
         dispatch(getCompaniesData());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     if (loading) {
         return (
