@@ -8,20 +8,22 @@ import { ofAction } from 'typescript-fsa-redux-observable'
 import { AnyAction } from 'typescript-fsa'
 import actions from 'actions/company'
 import { ajax } from 'rxjs/ajax'
-import { catchError, map, mergeMap } from 'rxjs/operators'
+import { catchError, flatMap, map, switchMap } from 'rxjs/operators'
 import firebase from 'firebase';
 
 const api: CompanyApi = new CompanyApi(firebase.firestore());
 
 export const fetchCompanies: Epic<AnyAction> = (action$) => action$.pipe(
     ofAction(actions.fetchCompanies.started),
-    map((param) => {
-        const companies: Array<Company> = api.getCompanies();
-        return actions.fetchCompanies.done({
-            params: param.payload,
-            result: { companies: companies },
-        });
-    }),
+    switchMap(() =>
+        from(api.getCompanies()).pipe(
+            flatMap((companies) => {
+                console.log(companies);
+                return (actions.fetchCompanies.done({ params: '', result: { companies: companies } }
+                )
+                );
+            }),
+        )),
     catchError(error => Observable.of(actions.fetchCompanies.failed({
         params: 'param.payload',
         error: error,

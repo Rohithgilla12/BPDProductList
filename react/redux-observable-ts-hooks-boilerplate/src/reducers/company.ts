@@ -15,6 +15,7 @@ export default {
             })
         })
         .case(actions.fetchCompanies.done, (state, action) => {
+            console.log('Here');
             return immutable(state, {
                 loading: { $set: false },
                 companies: { $set: action.result.companies },
