@@ -11,9 +11,9 @@ import {
 
 import { Grid, TextField } from "@material-ui/core";
 import Loader from "react-loader-spinner";
-import { CompanyWrapper, CompanyCard, SearchWrapper } from "./company.styles";
+import { CompanyWrapper, SearchWrapper } from "./company.styles";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import { setSelectedCompany } from "../product/productSlice";
+import { CompaniesList } from "./CompaniesList";
 
 export function CompanyList() {
 	const companies = useSelector(selectCompanies);
@@ -53,21 +53,9 @@ export function CompanyList() {
 			</SearchWrapper>
 			<Grid container spacing={3}>
 				{query === ""
-					? companies.map((company) => (
-						<Grid item xs={6} md={3}>
-							<CompanyCard
-								key={company.id}
-								onClick={() => { dispatch(setSelectedCompany(company.id)) }}>
-								{company.name}
-							</CompanyCard>
-						</Grid>
-					))
-					: searchedCompanies &&
-					searchedCompanies.map((company) => (
-						<Grid item xs={6} md={3}>
-							<CompanyCard key={company.id}>{company.name}</CompanyCard>
-						</Grid>
-					))}
+					? <CompaniesList companies={companies} />
+					: <CompaniesList companies={searchedCompanies} />
+				}
 			</Grid>
 		</CompanyWrapper>
 	);

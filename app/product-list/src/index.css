@@ -20,3 +20,8 @@ code {
   color: #eeeeee !important;
   background: #393e46 !important;
 }
+
+a{
+  text-decoration: none;
+  color: white;
+}
