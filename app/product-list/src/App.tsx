@@ -1,21 +1,34 @@
-import React from 'react';
-import './App.css';
-import { CompanyList } from './features/company/Company';
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-} from "react-router-dom";
-import { ProductList } from './features/product/ProductList';
-import { Typography } from '@material-ui/core';
+import React from "react";
+import "./App.css";
+import { CompanyList } from "./features/company/Company";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { ProductList } from "./features/product/ProductList";
+import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import { SearchAll } from "./features/product/SearchAll";
 
 function App() {
 	return (
 		<Router>
 			<div className="App">
 				<header className="App-header">
-					<Typography variant="h3">Balaji Pharma Distributors Product List</Typography>
+					<AppBar position="static">
+						<Toolbar>
+							<Typography variant="h6" style={{
+								flexGrow: 1,
+							}}>
+								<Link to="/">
+									Balaji Pharma Distributors Product List
+								</Link>
+							</Typography>
+							<Link to="/search" color="inherit">
+								Search
+							</Link>
+						</Toolbar>
+					</AppBar>
 					<Switch>
+						<Route path="/search">
+							<SearchAll />
+						</Route>
 						<Route path="/products">
 							<ProductList />
 						</Route>
@@ -25,7 +38,7 @@ function App() {
 					</Switch>
 				</header>
 			</div>
-		</Router>
+		</Router >
 	);
 }
 

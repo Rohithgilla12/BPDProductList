@@ -2,7 +2,6 @@ import { Grid, TextField } from "@material-ui/core";
 import React, { useState } from "react";
 import Loader from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
 import { SearchWrapper } from "../company/company.styles";
 import { Product, selectedProducts, isGettingProducts, searchProducts, searchResults } from "./productSlice";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -49,8 +48,3 @@ export function ProductList() {
 	);
 }
 
-export const ProductWrapper = styled.div`
-    display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-`;

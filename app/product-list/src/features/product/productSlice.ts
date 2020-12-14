@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import FuzzySearch from "fuzzy-search";
-import { firestoreInstance } from "../../app/constants";
+import { algoliaIndex, firestoreInstance } from "../../app/constants";
 import { AppThunk, RootState } from "../../app/store";
 
 interface ProductState {
@@ -8,6 +8,7 @@ interface ProductState {
 	readonly products: Record<string, Array<Product>>;
 	readonly searchResults?: Array<Product>;
 	readonly selectedCompanyId?: string;
+	readonly allSearchResults?: Array<Product>;
 }
 
 export interface Product {
@@ -45,6 +46,10 @@ export const productSlice = createSlice({
 			state.searchResults = action.payload;
 		},
 
+		allSearchProducts: (state, action: PayloadAction<Array<Product>>) => {
+			state.allSearchResults = action.payload;
+		},
+
 		clearSearchResults: (state) => {
 			state.searchResults = [];
 		}
@@ -56,7 +61,20 @@ export const {
 	setLoading,
 	setSelectedCompany,
 	searchedProducts,
+	allSearchProducts,
 } = productSlice.actions;
+
+export const searchAll = (query: string): AppThunk => (dispatch) => {
+	var products: Array<Product> = [];
+	algoliaIndex.search(query)
+		.then(({ hits }) => {
+			hits.forEach((rawProduct) => {
+				const product = (rawProduct as any) as Product;
+				products = products.concat(product);
+			});
+			dispatch(allSearchProducts(products));
+		});
+}
 
 export const getSelectedProducts = (): AppThunk => (dispatch, getState) => {
 	dispatch(setLoading(true));
@@ -97,5 +115,7 @@ export const selectedProducts = (state: RootState) => {
 };
 export const isGettingProducts = (state: RootState) => state.product.loading;
 export const searchResults = (state: RootState) => state.product.searchResults;
+
+export const allSearchResults = (state: RootState) => state.product.allSearchResults;
 
 export default productSlice.reducer;
