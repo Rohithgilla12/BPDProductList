@@ -1,12 +1,13 @@
 import { firestoreInstance } from './../../app/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from '../../app/store';
+import FuzzySearch from 'fuzzy-search';
 
 
 interface CompanyState {
   readonly loading: boolean;
-  companies: Array<Company>;
-  searchResults: Array<Company>;
+  readonly companies: Array<Company>;
+  readonly searchResults?: Array<Company>;
 }
 
 
@@ -18,7 +19,6 @@ interface Company {
 const initialState: CompanyState = {
   loading: false,
   companies: [],
-  searchResults: [],
 };
 
 export const companySlice = createSlice({
@@ -63,7 +63,8 @@ export const getCompaniesData = (): AppThunk => dispatch => {
 export const searchCompanies = (query: string): AppThunk => (dispatch, getState) => {
   const currentState: CompanyState = getState().company;
   const companies = currentState.companies;
-  const searchResults: Array<Company> = companies.filter((company) => company.name.includes(query));
+  const searcher = new FuzzySearch(companies, ['name']);
+  const searchResults: Array<Company> = searcher.search(query);
   dispatch(searchedCompanies(searchResults));
 }
 

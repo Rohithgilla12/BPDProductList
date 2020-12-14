@@ -15,3 +15,8 @@ code {
     monospace;
 }
 
+
+.MuiInputBase-input{
+  color: #eeeeee !important;
+  background: #393e46 !important;
+}
