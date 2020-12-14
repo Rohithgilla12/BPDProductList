@@ -1,13 +1,11 @@
 import { Grid, Typography } from "@material-ui/core";
 import React from "react";
-import { useDispatch } from "react-redux";
 import { CompanyCard } from "../company/company.styles";
 import { Product } from "./productSlice";
 import { ProductWrapper } from "./ProductList";
 
 export function ProductsList(props: { products: Array<Product> | undefined; }) {
 	const { products } = props;
-	const dispatch = useDispatch();
 	return (
 		<>
 			{products?.map((product) => (
