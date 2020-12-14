@@ -4,9 +4,9 @@ import { AppThunk, RootState } from '../../app/store';
 
 
 interface CompanyState {
-  readonly loading: boolean,
-  readonly companies: Array<Company>,
-  readonly selectedCompanyId?: string,
+  readonly loading: boolean;
+  companies: Array<Company>;
+  searchResults: Array<Company>;
 }
 
 
@@ -18,6 +18,7 @@ interface Company {
 const initialState: CompanyState = {
   loading: false,
   companies: [],
+  searchResults: [],
 };
 
 export const companySlice = createSlice({
@@ -33,30 +34,41 @@ export const companySlice = createSlice({
       state.loading = action.payload;
     },
 
-    setSelectedCompany: (state, action: PayloadAction<string>) => {
-      state.selectedCompanyId = action.payload;
+    searchedCompanies: (state, action: PayloadAction<Array<Company>>) => {
+      state.searchResults = action.payload;
     },
   },
 });
 
-export const { setLoading, getCompanies, setSelectedCompany } = companySlice.actions;
+export const { setLoading, getCompanies, searchedCompanies } = companySlice.actions;
 
 export const getCompaniesData = (): AppThunk => dispatch => {
   dispatch(setLoading(true));
   var companies: Array<Company> = [];
-  firestoreInstance.collection('companies').orderBy('name').get().then((documentSnapshot) => {
-    documentSnapshot.forEach((document) => {
-      if (document.exists) {
-        const company = document.data() as Company;
-        companies = companies.concat(company);
-      }
-    });
-    dispatch(getCompanies(companies));
-  })
-
+  firestoreInstance
+    .collection('companies')
+    .orderBy('name')
+    .get()
+    .then((documentSnapshot) => {
+      documentSnapshot.forEach((document) => {
+        if (document.exists) {
+          const company = document.data() as Company;
+          companies = companies.concat(company);
+        }
+      });
+      dispatch(getCompanies(companies));
+    })
 };
 
+export const searchCompanies = (query: string): AppThunk => (dispatch, getState) => {
+  const currentState: CompanyState = getState().company;
+  const companies = currentState.companies;
+  const searchResults: Array<Company> = companies.filter((company) => company.name.includes(query));
+  dispatch(searchedCompanies(searchResults));
+}
+
 export const selectCompanies = (state: RootState) => state.company.companies;
+export const searchResults = (state: RootState) => state.company.searchResults;
 export const isGettingCompanies = (state: RootState) => state.company.loading;
 
 export default companySlice.reducer;

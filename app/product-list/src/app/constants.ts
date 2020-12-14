@@ -12,5 +12,10 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+firebase.firestore().settings({
+    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+});
+
+firebase.firestore().enablePersistence()
 
 export const firestoreInstance = firebase.firestore();

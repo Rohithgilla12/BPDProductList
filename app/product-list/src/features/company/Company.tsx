@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getCompaniesData, selectCompanies, isGettingCompanies } from './companySlice';
+import { getCompaniesData, selectCompanies, isGettingCompanies, searchCompanies, searchResults } from './companySlice';
 import styled from 'styled-components';
 import { Grid, TextField } from '@material-ui/core';
 import Loader from 'react-loader-spinner'
@@ -9,7 +9,9 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 export function CompanyList() {
     const companies = useSelector(selectCompanies);
     const loading = useSelector(isGettingCompanies);
+    const searchedCompanies = useSelector(searchResults);
     const dispatch = useDispatch();
+    const [query, setQuery] = useState("");
 
     useEffect(() => {
         if (companies.length === 0)
@@ -21,12 +23,15 @@ export function CompanyList() {
             <Loader type="TailSpin" color="#00adb5" height={80} width={80} />
         )
     }
+
+    const companiesToRender = query === "" ? companies : searchedCompanies;
+
     return (
         <CompanyWrapper>
             <SearchWrapper>
                 <TextField
                     fullWidth
-                    color="secondary"
+                    color="primary"
                     margin="normal"
                     id="outlined-basic"
                     label="Search"
@@ -34,11 +39,15 @@ export function CompanyList() {
                     placeholder="Search for companies"
                     InputLabelProps={{
                         shrink: true,
-                    }} />
+                    }}
+                    onChange={(event) => {
+                        setQuery(event.target.value);
+                        dispatch(searchCompanies(query));
+                    }}
+                />
             </SearchWrapper>
-
             <Grid container spacing={3}>
-                {companies.map((company) => (
+                {companiesToRender.map((company) => (
                     <Grid item xs={6} md={3}>
                         <CompanyCard key={company.id}>
                             {company.name}
