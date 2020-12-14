@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getCompaniesData, selectCompanies, isGettingCompanies } from './companySlice';
 import styled from 'styled-components';
-import Grid from '@material-ui/core/Grid';
+import { Grid, TextField } from '@material-ui/core';
 import Loader from 'react-loader-spinner'
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
@@ -12,7 +12,8 @@ export function CompanyList() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getCompaniesData());
+        if (companies.length === 0)
+            dispatch(getCompaniesData());
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     if (loading) {
@@ -22,6 +23,20 @@ export function CompanyList() {
     }
     return (
         <CompanyWrapper>
+            <SearchWrapper>
+                <TextField
+                    fullWidth
+                    color="secondary"
+                    margin="normal"
+                    id="outlined-basic"
+                    label="Search"
+                    variant="outlined"
+                    placeholder="Search for companies"
+                    InputLabelProps={{
+                        shrink: true,
+                    }} />
+            </SearchWrapper>
+
             <Grid container spacing={3}>
                 {companies.map((company) => (
                     <Grid item xs={6} md={3}>
@@ -44,8 +59,14 @@ const CompanyWrapper = styled.div`
 const CompanyCard = styled.div`
     margin: 1rem;
     padding: 1rem;
-    background-color:#393e46;
-    color:#eeeeee;
+    background-color:#393e46;    
     font-size:0.6em;
     border-radius:16px;
+`;
+
+const SearchWrapper = styled.div`
+    margin: 1rem;
+    padding: 1rem;
+    width:100%;
+    color:#eeeeee;
 `;
