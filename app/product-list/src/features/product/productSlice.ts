@@ -1,10 +1,12 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { firestoreInstance } from '../../app/constants';
-import { AppThunk, RootState } from '../../app/store';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import FuzzySearch from "fuzzy-search";
+import { firestoreInstance } from "../../app/constants";
+import { AppThunk, RootState } from "../../app/store";
 
 interface ProductState {
 	readonly loading: boolean;
 	readonly products: Record<string, Array<Product>>;
+	readonly searchResults?: Array<Product>;
 	readonly selectedCompanyId?: string;
 }
 
@@ -17,11 +19,11 @@ export interface Product {
 
 const initialState: ProductState = {
 	loading: false,
-	products: {}
-}
+	products: {},
+};
 
 export const productSlice = createSlice({
-	name: 'product',
+	name: "product",
 	initialState,
 	reducers: {
 		getProducts: (state, action: PayloadAction<Array<Product>>) => {
@@ -38,19 +40,32 @@ export const productSlice = createSlice({
 		setSelectedCompany: (state, action: PayloadAction<string>) => {
 			state.selectedCompanyId = action.payload;
 		},
-	}
-})
 
-export const { getProducts, setLoading, setSelectedCompany } = productSlice.actions;
+		searchedProducts: (state, action: PayloadAction<Array<Product>>) => {
+			state.searchResults = action.payload;
+		},
+
+		clearSearchResults: (state) => {
+			state.searchResults = [];
+		}
+	},
+});
+
+export const {
+	getProducts,
+	setLoading,
+	setSelectedCompany,
+	searchedProducts,
+} = productSlice.actions;
 
 export const getSelectedProducts = (): AppThunk => (dispatch, getState) => {
 	dispatch(setLoading(true));
 	const currentState: ProductState = getState().product;
 	var products: Array<Product> = [];
 	firestoreInstance
-		.collection('products')
-		.orderBy('name')
-		.where('companyId', '==', currentState.selectedCompanyId)
+		.collection("products")
+		.orderBy("name")
+		.where("companyId", "==", currentState.selectedCompanyId)
 		.get()
 		.then((documentSnapshot) => {
 			documentSnapshot.forEach((document) => {
@@ -60,12 +75,27 @@ export const getSelectedProducts = (): AppThunk => (dispatch, getState) => {
 				}
 			});
 			dispatch(getProducts(products));
-		})
-}
+		});
+};
+
+export const searchProducts = (query: string): AppThunk => (
+	dispatch,
+	getState
+) => {
+	const currentState: ProductState = getState().product;
+	if (currentState.selectedCompanyId) {
+		const products = currentState.products[currentState.selectedCompanyId];
+		const searcher = new FuzzySearch(products, ["name"]);
+		const searchResults: Array<Product> = searcher.search(query);
+		dispatch(searchedProducts(searchResults));
+	}
+};
 
 export const selectedProducts = (state: RootState) => {
-	if (state.product.selectedCompanyId) return state.product.products[state.product.selectedCompanyId];
+	if (state.product.selectedCompanyId)
+		return state.product.products[state.product.selectedCompanyId];
 };
 export const isGettingProducts = (state: RootState) => state.product.loading;
+export const searchResults = (state: RootState) => state.product.searchResults;
 
 export default productSlice.reducer;
